@@ -18,6 +18,9 @@ require('./model')
 // 引入路由中间件
 app.use('/api', require('./routes'))
 
+// 引入错误处理中间件
+app.use(require('./middleware/error'))
+
 app.listen(config.app.port, () => {
   console.log(`running at http://localhost:${config.app.port}`)
 })
