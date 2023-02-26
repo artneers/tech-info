@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const joi = require('joi')
-const Joi = require('joi')
 
 // 定义 user 的结构
 const userSchema = new mongoose.Schema({
@@ -31,9 +30,20 @@ const User = mongoose.model('User', userSchema)
 // 创建内容校验规则对象
 function userValidator (data) {
   const schema = joi.object({
-    email: joi.string().email().trim().lowercase().required(),
-    name: joi.string().min(2).max(50),
-    password: joi.string().pattern(/^[a-zA-Z0-9]{6,12}$/).exist()
+    email: joi.string().email().trim().lowercase().required().messages({
+      'any.required': '缺少必选参数 email',
+      'string.email': 'email 格式错误'
+    })
+    ,
+    name: joi.string().min(2).max(50).messages({
+      'string.base': 'name 必须为 String',
+      'string.max': 'name 最多 50 个字符',
+      'string.min': 'name 最少 2 个 字符'
+    }),
+    password: joi.string().pattern(/^[a-zA-Z0-9]{6,12}$/).exist().messages({
+      'string.pattern.base': '密码不符合规则',
+      'any.required': '缺少必选参数 password'
+    })
   })
   return schema.validate(data)
 }
