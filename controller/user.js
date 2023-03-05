@@ -3,6 +3,7 @@ const { User } = require('../model/user')
 
 const bcrypt = require('bcrypt')
 
+
 // 注册用户
 exports.register = async (req, res, next) => {
   try {
@@ -46,27 +47,78 @@ exports.register = async (req, res, next) => {
 }
 
 // 获取用户
-exports.getInfo = (req, res, next) => {
+exports.getInfo = async (req, res, next) => {
   try {
-    res.send('获取用户')
+    const data = await User.findById(req.userData._id, { password: 0 })
+    res.status(200).json({
+      code: 200,
+      msg: '获取用户信息成功',
+      data
+    })
   } catch (err) {
     next(err)
   }
 }
 
 // 编辑用户
-exports.updateInfo = (req, res, next) => {
+exports.updateInfo = async (req, res, next) => {
   try {
-    res.send('编辑用户')
+    const body = req.body
+    // body 存在，_id 不存在，返回400
+    if(!body._id) {
+      return res.status(400).json({
+        code: 400,
+        msg: '缺少参数 _id'
+      })
+    }
+    // body 和 _id 存在，更新用户信息
+    const data = await User.findByIdAndUpdate(body._id, body)
+    // 更新用户信息失败，返回400
+    if(!data) {
+      return res.status(400).json({
+        code: 400,
+        msg: '更新用户信息失败'
+      })
+    }
+    delete body.password
+    // _id 用户可以查到
+    res.status(200).json({
+      code: 200,
+      msg: '编辑用户信息成功',
+      data: body
+    }) 
   } catch (err) {
     next(err)
   }
 }
 
 // 删除用户
-exports.deleteUser = (req, res, next) => {
+exports.deleteUser = async (req, res, next) => {
   try {
-    res.send('删除用户')
+    const _id = req.body._id
+    // _id 不存在，返回400
+    if(!_id) {
+      return res.status(400).json({
+        code: 400,
+        msg: '缺少参数 _id'
+      })
+    }
+    const data = await User.findByIdAndDelete(_id)
+    // 删除失败，返回400
+    if(!data) {
+      return res.status(400).json({
+        code: 400,
+        msg: '删除用户失败',
+        data: {
+          _id
+        }
+      })
+    }
+    res.status(200).json({
+      code: 200,
+      msg: '删除用户成功',
+      data
+    })
   } catch (err) {
     next(err)
   }
