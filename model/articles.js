@@ -34,10 +34,10 @@ const articleSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   }
-})
+}, { timestamps: true })
 
 // 创建model
-const Article = mongoose.model('article', articleSchema)
+const Article = mongoose.model('Article', articleSchema)
 
 // 创建校验函数
 function articleValidator(data) {

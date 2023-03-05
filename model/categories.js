@@ -12,7 +12,7 @@ const categorySchema = new mongoose.Schema({
 })
 
 // 创建 model
-const Category =  mongoose.model('category', categorySchema)
+const Category =  mongoose.model('Category', categorySchema)
 
 // 定义检验函数
 function categoryValidator(data) {
