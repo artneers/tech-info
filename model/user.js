@@ -1,5 +1,8 @@
 const mongoose = require('mongoose')
 const joi = require('joi')
+const config = require('../config')
+const jwt = require('jsonwebtoken')
+joi.objectId = require('joi-objectid')(joi)
 
 // 定义 user 的结构
 const userSchema = new mongoose.Schema({
@@ -24,6 +27,12 @@ const userSchema = new mongoose.Schema({
   }
 })
 
+userSchema.methods.generateToken = function () {
+  return jwt.sign({
+    _id: this._id
+  }, config.jwtPrivateKey)
+}
+
 // 创建 model
 const User = mongoose.model('User', userSchema)
 
@@ -43,7 +52,8 @@ function userValidator (data) {
     password: joi.string().pattern(/^[a-zA-Z0-9]{6,12}$/).exist().messages({
       'string.pattern.base': '密码不符合规则',
       'any.required': '缺少必选参数 password'
-    })
+    }),
+    _id: joi.objectId()
   })
   return schema.validate(data)
 }
