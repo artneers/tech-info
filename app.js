@@ -1,9 +1,10 @@
 const config = require('./config')
-console.log(config)
 
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
+const path = require('path')
+const ejs = require('ejs')
 
 const app = express()
 
@@ -20,6 +21,19 @@ app.use('/api', require('./routes'))
 
 // 引入错误处理中间件
 app.use(require('./middleware/error'))
+
+// 静态资源
+app.use(express.static(path.join(__dirname, './public')))
+
+// 设置视图目录位置
+app.set('views', path.join(__dirname, './views'))
+// 设置视图引擎为ejs
+app.set('view engine', 'ejs')
+// 将html文件通过ejs处理
+app.engine('html', ejs.renderFile)
+
+// 引入路由文件
+app.use(require('./routes/pages'))
 
 app.listen(config.app.port, () => {
   console.log(`running at http://localhost:${config.app.port}`)

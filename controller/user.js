@@ -1,5 +1,6 @@
 // 引入 User 模型
 const { User } = require('../model/user')
+const { Article } = require('../model/articles')
 
 const bcrypt = require('bcrypt')
 
@@ -104,6 +105,10 @@ exports.deleteUser = async (req, res, next) => {
       })
     }
     const data = await User.findByIdAndDelete(_id)
+    // 同时删除该用户创建的所有文章
+    const data2 = await Article.remove({
+      author: _id
+    })
     // 删除失败，返回400
     if(!data) {
       return res.status(400).json({
